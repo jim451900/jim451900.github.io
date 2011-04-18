@@ -3,6 +3,35 @@ window.addEvent('domready', function() {
   codeblocks.each(addExpander);
 });
 
+window.addEvents({
+  domready: function(){
+    if(twitter_user){
+      new Request.Twitter(twitter_user, {
+        include_replies: false,
+        data: { count: 3 },
+        onSuccess: function(tweets){
+          $('tweets').empty();
+          for (var i = tweets.length; i--; ){
+            new Element('li', {
+              'class': 'tweet'
+              }).adopt(
+              new Element('p', { 'html': tweets[i].text+' ' }).adopt(
+                new Element('a', {
+                  'href': 'http://twitter.com/'+twitter_user+'/status/'+tweets[i].id_str,
+                  'text': new Date(tweets[i].created_at).timeDiffInWords()
+                }))
+            ).inject('tweets', 'top');
+          }
+        }
+      }).send();
+    }
+    $$('#recent_posts time').each(function(date){
+      date.set('text', new Date(date.get('text')).timeDiffInWords());
+    });
+  },
+});
+
+
 function addExpander(div){
   new Element('span',{
 		html: 'expand &raquo;',
